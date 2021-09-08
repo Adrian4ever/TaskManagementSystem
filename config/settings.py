@@ -11,15 +11,16 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 from datetime import timedelta
 from pathlib import Path
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+env = environ.Env()
+environ.Env.read_env(f"{BASE_DIR}/.env")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-gry0rm+62vuhw+nny6%z^k_j5cjkeypdn3bn2j)a#63#&6yekg'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -40,6 +41,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'apps.users',
     'apps.tasks',
+    'apps.comments',
+    'apps.timelogs',
 ]
 
 MIDDLEWARE = [
@@ -99,6 +102,8 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = env('SECRET_KEY')
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
@@ -136,12 +141,12 @@ AUTH_USER_MODEL = 'users.User'
 
 REST_FRAMEWORK = {
 
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
+    # 'DEFAULT_AUTHENTICATION_CLASSES': (
+    #     'rest_framework_simplejwt.authentication.JWTAuthentication',
+    # ),
+    # 'DEFAULT_PERMISSION_CLASSES': (
+    #     'rest_framework.permissions.IsAuthenticated',
+    # ),
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
     ),
@@ -160,6 +165,13 @@ SWAGGER_SETTINGS = {
 }
 
 SIMPLE_JWT = {
-    'TOKEN_LIFETIME': timedelta(days=1),
-    'TOKEN_REFRESH_LIFETIME': timedelta(days=7),
+    'ACCESS_TOKEN_LIFETIME ': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME ': timedelta(days=7),
 }
+
+# EMAIL_HOST_USER = env('EMAIL_USER')
+# EMAIL_HOST_PASSWORD = env('EMAIL_PASS')
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+# EMAIL_USE_SSL = True
