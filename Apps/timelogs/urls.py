@@ -8,6 +8,6 @@ router.register(r'timelogs', TimeLogViewSet, basename='timelogs')
 
 urlpatterns = router.urls
 
-urlpatterns += [
+urlpatterns = [
 
-]
+] + router.urls

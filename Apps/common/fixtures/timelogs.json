@@ -1,0 +1,12 @@
+[
+   {
+      "model":"timelogs.timelog",
+      "pk":1,
+      "fields":{
+         "start_time":"2021-09-10T07:48:37.588Z",
+         "end_time":"2021-09-10T08:48:37.588Z",
+         "task":1,
+         "owner":1
+      }
+   }
+]

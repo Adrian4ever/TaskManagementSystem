@@ -1,7 +1,10 @@
+from datetime import timedelta
+
 import django_filters
 from django.conf.global_settings import DEFAULT_FROM_EMAIL
 from django.core.mail import send_mail
 from django.db.models import Sum, F
+from django.utils import timezone
 from rest_framework import generics, filters
 from rest_framework.decorators import action
 from rest_framework.generics import GenericAPIView, get_object_or_404
@@ -10,7 +13,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from apps.tasks.models import Task
 from apps.tasks.serializers import TaskSerializer, TaskCreateSerializer, TasksInfoSerializer, TaskUpdateSerializer, \
-    TaskUpdateStatusSerializer, TaskItemSerializer, TaskItemLogsSerializer
+    TaskUpdateStatusSerializer, TaskItemSerializer, TaskItemLogsSerializer, TaskSearchSerializer
 from apps.users.get_user_model import USER_MODEL
 from apps.users.serializers import UserSerializer
 
@@ -37,11 +40,6 @@ class TaskViewSet(ModelViewSet):
         tasks = Task.objects.annotate(work_time=Sum(F('timelog__end_time') - F('timelog__start_time')))
         return Response(TaskSerializer(tasks, many=True).data)
 
-        # def get_work_time(self, instance):
-        #     work_time = Task.objects.annotate(
-        #         total=Sum(F('timelog__end_time') - F('timelog__start_time')))
-        #     return work_time
-
     @action(methods=['GET'], detail=False, serializer_class=TasksInfoSerializer)
     def my(self, request):
         tasks = Task.objects.filter(owner=self.request.user)
@@ -51,6 +49,13 @@ class TaskViewSet(ModelViewSet):
     def completed(self, request):
         tasks = Task.objects.filter(is_completed=True)
         return Response(TasksInfoSerializer(tasks, many=True).data)
+
+    @action(methods=['GET'], detail=False, serializer_class=TaskSerializer, url_path='top-20')
+    def top_20(self, request):
+        tasks = Task.objects.filter(timelog__end_time__gte=timezone.now() - timedelta(days=30)).annotate(
+            work_time=Sum(F('timelog__end_time') - F('timelog__start_time'))).order_by(
+            '-work_time')[:20]
+        return Response(TaskSerializer(tasks, many=True).data)
 
     @action(methods=['PATCH'], detail=True, serializer_class=TaskUpdateSerializer, url_path="update-owner")
     def update_owner(self, request, pk):
@@ -119,7 +124,7 @@ class TaskListViewWithWorktime(GenericAPIView):
 
 
 class TaskSearchView(generics.ListAPIView):
+    serializer_class = TaskSearchSerializer
     queryset = Task.objects.all()
-    serializer_class = TaskSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['title']

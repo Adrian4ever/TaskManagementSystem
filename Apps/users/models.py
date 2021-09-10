@@ -1,6 +1,5 @@
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.db import models
-from rest_framework import serializers
 
 
 class UserManager(BaseUserManager):
@@ -42,6 +41,3 @@ class User(AbstractBaseUser):
         return self.email
 
     objects = UserManager()
-
-
-

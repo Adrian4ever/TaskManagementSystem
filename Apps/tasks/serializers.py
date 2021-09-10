@@ -14,8 +14,14 @@ class TaskSerializer(serializers.ModelSerializer):
 
     def get_work_time(self, obj):
         if obj.work_time:
-            return obj.work_time/60
+            return obj.work_time / 60
         return obj.work_time
+
+
+class TaskSearchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Task
+        fields = '__all__'
 
 
 class TaskCreateSerializer(serializers.ModelSerializer):

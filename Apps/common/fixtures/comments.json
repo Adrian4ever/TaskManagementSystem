@@ -1,0 +1,26 @@
+[
+   {
+      "model":"comments.comment",
+      "pk":1,
+      "fields":{
+         "task":1,
+         "text":"string"
+      }
+   },
+   {
+      "model":"comments.comment",
+      "pk":3,
+      "fields":{
+         "task":1,
+         "text":"test2"
+      }
+   },
+   {
+      "model":"comments.comment",
+      "pk":4,
+      "fields":{
+         "task":2,
+         "text":"test3"
+      }
+   }
+]
