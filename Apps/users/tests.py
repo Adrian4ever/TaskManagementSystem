@@ -36,3 +36,12 @@ class TestComment(APITestCase):
         }
         response = self.client.post(reverse('token_obtain_pair'), data=fake_data, format='json')
         self.assertEqual(response.status_code, 200)
+
+    def test_token_refresh(self):
+        fake_data = {
+            "refresh": faker.password(),
+        }
+        token = self.client.post(reverse('token_obtain_pair'), data={"email": 'adrianursu121@gmail.com',
+                                                                     "password": 'admin'}, format='json').json()
+        response = self.client.post(reverse('token_refresh'), data={"refresh": token.get('refresh')}, format='json')
+        self.assertEqual(response.status_code, 200)
