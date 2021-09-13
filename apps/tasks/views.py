@@ -1,10 +1,12 @@
 from datetime import timedelta
-
+import redis
 import django_filters
 from django.conf.global_settings import DEFAULT_FROM_EMAIL
 from django.core.mail import send_mail
 from django.db.models import Sum, F
 from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from rest_framework import generics, filters
 from rest_framework.decorators import action
 from rest_framework.generics import GenericAPIView, get_object_or_404
@@ -50,11 +52,14 @@ class TaskViewSet(ModelViewSet):
         tasks = Task.objects.filter(is_completed=True)
         return Response(TasksInfoSerializer(tasks, many=True).data)
 
+    @method_decorator(cache_page(60))
     @action(methods=['GET'], detail=False, serializer_class=TaskSerializer, url_path='top-20')
     def top_20(self, request):
-        tasks = Task.objects.filter(timelog__end_time__gte=timezone.now() - timedelta(days=30)).annotate(
-            work_time=Sum(F('timelog__end_time') - F('timelog__start_time'))).order_by(
-            '-work_time')[:20]
+        tasks = Task.objects.filter(
+            timelog__end_time__gte=timezone.now() - timedelta(days=30)
+        ).annotate(
+            work_time=Sum(F('timelog__end_time') - F('timelog__start_time'))
+        ).order_by('-work_time')[:20]
         return Response(TaskSerializer(tasks, many=True).data)
 
     @action(methods=['PATCH'], detail=True, serializer_class=TaskUpdateSerializer, url_path="update-owner")

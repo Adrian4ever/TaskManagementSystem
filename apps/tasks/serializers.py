@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from apps.comments.serializers import CommentsSerializer
+from apps.tasks import models
 from apps.tasks.models import Task
 from apps.timelogs.serializers import TimelogSerializer
 
